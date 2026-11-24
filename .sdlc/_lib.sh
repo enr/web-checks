@@ -11,7 +11,7 @@ sdlc_dir="$( cd -P "$( dirname "$tool_source" )" && pwd )"
 prj_home="$( cd -P "$( dirname "$sdlc_dir" )" && pwd )"
 export sdlc_dir prj_home
 
-cd "${prj_home}"
+cd "${prj_home}" || exit 1
 
 require() {
   local missing=""

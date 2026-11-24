@@ -10,7 +10,7 @@
 #   WEB_CHECKS_CI_STRICT=1   a skipped suite fails the run (a runner meant to have Chromium)
 
 set -euo pipefail
-# shellcheck source=_lib.sh
+# shellcheck source-path=SCRIPTDIR source=_lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 
 suite="${1:-unit}"
