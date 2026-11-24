@@ -2,7 +2,7 @@
 # Applies biome's safe fixes and formatting, then checks again.
 
 set -euo pipefail
-# shellcheck source=_lib.sh
+# shellcheck source-path=SCRIPTDIR source=_lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 
 echo "--- Fix lint and format issues (biome check --write) ---"

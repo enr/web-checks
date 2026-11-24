@@ -2,7 +2,7 @@
 # Formats the code with biome (settings in biome.json).
 
 set -euo pipefail
-# shellcheck source=_lib.sh
+# shellcheck source-path=SCRIPTDIR source=_lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 
 pnpm exec biome format --write .

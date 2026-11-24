@@ -2,7 +2,7 @@
 # Biome (lint + format check) and the TypeScript type check. On failure: .sdlc/lint-fix.
 
 set -euo pipefail
-# shellcheck source=_lib.sh
+# shellcheck source-path=SCRIPTDIR source=_lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 
 echo "--- Linting and format check (biome) ---"

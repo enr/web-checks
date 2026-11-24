@@ -9,7 +9,7 @@
 # workflow; locally, out/ can feed poqa-web through ~/.config/poqa/web/tools.toml.
 
 set -euo pipefail
-# shellcheck source=_lib.sh
+# shellcheck source-path=SCRIPTDIR source=_lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 require npm sha256sum
 

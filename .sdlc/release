@@ -10,7 +10,7 @@
 # tag goes on the current commit.
 
 set -euo pipefail
-# shellcheck source=_lib.sh
+# shellcheck source-path=SCRIPTDIR source=_lib.sh
 source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 require git jq
 
@@ -40,11 +40,10 @@ git fetch --quiet
 echo "Release ${release_version} (tag ${tag_name}), then snapshot ${snapshot_version}"
 
 set_version() {
-  local tmp
-  tmp="$(mktemp)"
-  jq --arg v "$1" '.version = $v' package.json > "${tmp}"
-  cat "${tmp}" > package.json
-  rm -f "${tmp}"
+  # Edit the version line in place: rewriting the whole file (jq) would reformat
+  # it and break the biome format check of the tag build.
+  sed -i "s/^  \"version\": \".*\",$/  \"version\": \"$1\",/" package.json
+  [[ "$(jq -r .version package.json)" == "$1" ]] || { echo "Cannot set version $1 in package.json"; exit 1; }
   sed -i "s/^export const VERSION = '.*';$/export const VERSION = '$1';/" src/version.ts
   git add package.json src/version.ts
 }
