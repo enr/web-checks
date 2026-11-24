@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>IndexedDB session</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      // Like Firebase Auth: the session lives in IndexedDB.
+      const open = indexedDB.open('auth', 1);
+      open.onupgradeneeded = () => open.result.createObjectStore('kv');
+      open.onsuccess = () => {
+        const get = open.result.transaction('kv').objectStore('kv').get('token');
+        get.onsuccess = () => {
+          document.getElementById('app').innerHTML = get.result
+            ? '<p id="idb-ok">signed in</p>'
+            : '<p id="idb-missing">signed out</p>';
+        };
+      };
+    </script>
+  </body>
+</html>

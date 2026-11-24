@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# The whole pipeline, as CI runs it: install, lint, tests, package (build + smoke test).
+# Browser tests run when Playwright's Chromium is installed (see .sdlc/test).
+
+set -euo pipefail
+# shellcheck source=_lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
+
+echo "==> install"
+pnpm install --frozen-lockfile
+
+echo "==> lint"
+"${sdlc_dir}/lint"
+
+echo "==> test"
+"${sdlc_dir}/test" all
+
+echo "==> package"
+"${sdlc_dir}/package"

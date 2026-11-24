@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Compiles src/ into dist/ (tsup): dist/cli/index.js is the web-checks CLI.
+
+set -euo pipefail
+# shellcheck source=_lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
+
+[ -d node_modules ] || pnpm install --frozen-lockfile
+pnpm build "$@"
+echo "==> built dist/ (web-checks $(project_version))"

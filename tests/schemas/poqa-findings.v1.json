@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/enr/effective-train/docs/schemas/poqa-findings.v1.json",
+  "title": "poqa-findings v1",
+  "description": "Common result format of the poqa suite (poqa-analytics, poqa-security, poqa-live, web-checks). Contract described in docs/poqa-findings.md. Adding optional fields keeps v1; removing a field or changing its meaning is v2.",
+  "type": "object",
+  "required": ["schema", "tool", "generated_at", "subject", "complete", "engines", "summary", "results"],
+  "properties": {
+    "schema": {
+      "const": "poqa-findings/v1"
+    },
+    "tool": {
+      "description": "The program that wrote this document.",
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "generated_at": {
+      "description": "When the checks ran (not when the document was exported), RFC 3339 in UTC.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "subject": {
+      "description": "What was checked.",
+      "type": "object",
+      "required": ["kind", "targets"],
+      "properties": {
+        "kind": {
+          "description": "code: a source tree (analytics, security, web-checks source/build mode); environment: a deployed environment seen from outside (poqa-live); web: pages in a browser (web-checks live mode); host: a machine seen from inside (reserved).",
+          "enum": ["code", "environment", "web", "host"]
+        },
+        "targets": {
+          "description": "Project path, URL(s) or host name(s), in the order the run received them.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "env": {
+          "description": "Environment name, when the run targets one (poqa-live --env).",
+          "type": "string"
+        },
+        "git": {
+          "description": "Revision of the checked source tree, when it is a git checkout.",
+          "type": "object",
+          "properties": {
+            "commit": { "type": "string" },
+            "ref": { "type": "string" },
+            "dirty": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "complete": {
+      "description": "False when an engine failed or a target could not be checked, so some results are missing: an empty result list is not a clean run unless complete is true.",
+      "type": "boolean"
+    },
+    "engines": {
+      "description": "Outcome of every engine (external tool or delegated program) the run used or skipped. Empty when everything ran in-process.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "status"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "version": { "type": "string" },
+          "status": { "enum": ["ok", "failed", "skipped"] },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["total", "by_status", "by_severity"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "by_status": {
+          "type": "object",
+          "required": ["pass", "warn", "fail", "error", "skipped"],
+          "properties": {
+            "pass": { "type": "integer", "minimum": 0 },
+            "warn": { "type": "integer", "minimum": 0 },
+            "fail": { "type": "integer", "minimum": 0 },
+            "error": { "type": "integer", "minimum": 0 },
+            "skipped": { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "by_severity": {
+          "description": "Results with status warn or fail, by severity. Results without a severity are not counted here.",
+          "type": "object",
+          "required": ["critical", "high", "medium", "low", "info"],
+          "properties": {
+            "critical": { "type": "integer", "minimum": 0 },
+            "high": { "type": "integer", "minimum": 0 },
+            "medium": { "type": "integer", "minimum": 0 },
+            "low": { "type": "integer", "minimum": 0 },
+            "info": { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "gate": {
+      "description": "Present only when the run applied an opt-in CI gate.",
+      "type": "object",
+      "required": ["passed", "threshold"],
+      "properties": {
+        "passed": { "type": "boolean" },
+        "threshold": {
+          "description": "The gate as given, e.g. \"--fail-on-status fail\" or \"--fail-below-grade C\".",
+          "type": "string"
+        }
+      }
+    },
+    "results": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/result" }
+    },
+    "properties": {
+      "description": "Tool-specific extra data about the whole run (e.g. the web-checks grade). Consumers must not depend on it to interpret the results.",
+      "type": "object"
+    }
+  },
+  "$defs": {
+    "result": {
+      "type": "object",
+      "required": ["check", "fingerprint", "status", "message"],
+      "properties": {
+        "check": {
+          "description": "Id of the rule or check that produced the result (RUN-01, api.health, LongMethod, a scanner rule id). Many results can share it.",
+          "type": "string",
+          "minLength": 1
+        },
+        "fingerprint": {
+          "description": "Identity of this result across runs, unique within the document: two runs that produce the same fingerprint are reporting the same thing (used by diffs).",
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "description": "pass: holds. warn: a problem that does not block. fail: a problem; the subject is not as expected. error: could not be verified (timeout, unreachable, engine failure). skipped: not run, see skip_reason.",
+          "enum": ["pass", "warn", "fail", "error", "skipped"]
+        },
+        "severity": {
+          "description": "How bad the problem is, independently of the status.",
+          "enum": ["critical", "high", "medium", "low", "info"]
+        },
+        "category": {
+          "description": "Grouping inside the tool: suite, pack, scanner family (secrets, dependency, sast, iac), lint, smell, duplication.",
+          "type": "string"
+        },
+        "engine": {
+          "description": "Engine that produced the result when it is not the tool itself (opengrep, betterleaks, biome).",
+          "type": "string"
+        },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "hint": {
+          "description": "How to fix it.",
+          "type": "string"
+        },
+        "location": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "description": "Path relative to the project root.",
+              "type": "string"
+            },
+            "start_line": { "type": "integer", "minimum": 1 },
+            "end_line": { "type": "integer", "minimum": 1 },
+            "symbol": {
+              "description": "Function, class or package the result is about.",
+              "type": "string"
+            },
+            "url": { "type": "string" }
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "expected": { "type": "string" },
+              "observed": { "type": "string" },
+              "ok": { "type": "boolean" }
+            }
+          }
+        },
+        "skip_reason": { "type": "string" },
+        "properties": {
+          "description": "Tool-specific extra data. Consumers must not depend on it to interpret the result.",
+          "type": "object"
+        }
+      }
+    }
+  }
+}

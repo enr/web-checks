@@ -1,0 +1,5 @@
+{
+  "name": "Broken",
+  "start_url": "/",
+  "icons": [ { "src": "/icons/icon-192.png", "sizes": "192x192" }, ]
+}

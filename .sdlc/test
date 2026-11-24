@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Runs the tests.
+#
+#   .sdlc/test [unit]   tests without a browser (default)
+#   .sdlc/test e2e      browser tests: need Playwright's Chromium
+#                       (pnpm exec playwright install chromium); skipped when it is missing
+#   .sdlc/test all      both
+#
+# Environment:
+#   WEB_CHECKS_CI_STRICT=1   a skipped suite fails the run (a runner meant to have Chromium)
+
+set -euo pipefail
+# shellcheck source=_lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
+
+suite="${1:-unit}"
+
+# Whether the Chromium of the installed Playwright is on disk.
+has_chromium() {
+  node --input-type=module -e "
+    import { existsSync } from 'node:fs';
+    import { chromium } from 'playwright';
+    process.exit(existsSync(chromium.executablePath()) ? 0 : 1);
+  " 2>/dev/null
+}
+
+run_unit() {
+  echo "--- Unit tests ---"
+  pnpm test:unit
+}
+
+run_e2e() {
+  echo "--- Browser tests (e2e) ---"
+  if has_chromium; then
+    pnpm test:e2e
+  elif [[ "${WEB_CHECKS_CI_STRICT:-0}" == 1 ]]; then
+    echo >&2 "Playwright's Chromium is not installed and WEB_CHECKS_CI_STRICT=1"
+    echo >&2 "  pnpm exec playwright install chromium"
+    exit 1
+  else
+    echo "SKIP: Playwright's Chromium is not installed (pnpm exec playwright install chromium)"
+  fi
+}
+
+case "${suite}" in
+  unit) run_unit ;;
+  e2e)  run_e2e ;;
+  all)  run_unit; run_e2e ;;
+  *)    echo >&2 "usage: ${0##*/} [unit|e2e|all]"; exit 2 ;;
+esac

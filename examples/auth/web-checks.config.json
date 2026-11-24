@@ -1,0 +1,8 @@
+{
+  "routes": ["/dashboard", "/settings"],
+  "auth": {
+    "storageState": ".auth/app.json",
+    "ready": { "selector": "[data-testid=\"app-shell\"]" },
+    "httpCredentials": { "username": "{{env.STAGING_USER}}", "password": "{{secret.STAGING_PASS}}" }
+  }
+}

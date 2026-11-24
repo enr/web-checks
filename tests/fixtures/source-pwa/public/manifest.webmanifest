@@ -1,0 +1,1 @@
+{ "name": "Source PWA", "short_name": "Src", "start_url": "/", "display": "standalone", "icons": [{ "src": "/icon.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" }] }

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Biome (lint + format check) and the TypeScript type check. On failure: .sdlc/lint-fix.
+
+set -euo pipefail
+# shellcheck source=_lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
+
+echo "--- Linting and format check (biome) ---"
+pnpm lint
+
+echo "--- Type checking (tsc) ---"
+pnpm typecheck
+
+# Tracked shell files: the .sdlc scripts and anything else with a bash/sh shebang.
+echo "--- Linting shell scripts (shellcheck) ---"
+if command -v shellcheck >/dev/null 2>&1; then
+  shell_files=()
+  while IFS= read -r f; do
+    if [[ "$f" == *.sh ]] || head -n1 "$f" | grep -qE '^#!.*\b(ba)?sh\b'; then shell_files+=("$f"); fi
+  done < <(git ls-files --cached --others --exclude-standard .sdlc)
+  shellcheck --severity=warning -x "${shell_files[@]}"
+  echo "${#shell_files[@]} shell files checked"
+elif [[ "${CI:-}" == true ]]; then
+  echo >&2 "shellcheck is not installed (apt install shellcheck)"
+  exit 1
+else
+  echo "SKIP: shellcheck not installed"
+fi

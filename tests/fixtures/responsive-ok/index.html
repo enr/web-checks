@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Responsive</title>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; font-size: 16px; }
+      img { max-width: 100%; height: auto; }
+      .row { display: flex; flex-wrap: wrap; }
+      .col { flex: 1 1 300px; padding: 16px; }
+      button { min-width: 48px; min-height: 48px; }
+      @media (max-width: 600px) { .col { flex-basis: 100%; } }
+    </style>
+  </head>
+  <body>
+    <div class="row">
+      <div class="col"><h2>One</h2><p>Some readable content here.</p><button>Go</button></div>
+      <div class="col"><h2>Two</h2><p>More readable content here.</p><button>Ok</button></div>
+    </div>
+  </body>
+</html>

@@ -219,22 +219,35 @@ effective-train when the contract changes.
 
 ## Development
 
+The scripts in `.sdlc/` are what CI runs; they use `pnpm` from `PATH`, or the
+version pinned in `packageManager` through `npx`.
+
 ```sh
-pnpm install
-pnpm test          # vitest
-pnpm lint          # biome
-pnpm typecheck     # tsc --noEmit
-pnpm build         # tsup -> dist/
+.sdlc/ci           # install, lint, all tests, package: the whole pipeline
+.sdlc/build        # tsup -> dist/
+.sdlc/lint         # biome + tsc --noEmit (+ shellcheck when installed)
+.sdlc/lint-fix     # biome's fixes and formatting
+.sdlc/fmt          # biome format
+.sdlc/test         # unit tests; `e2e` for the browser ones, `all` for both
+.sdlc/package      # out/web-checks-<version>.tgz + SHA256SUMS, smoke-tested
+.sdlc/release      # release commit + tag + next snapshot, then push
 ```
+
+The browser tests need Playwright's Chromium (`pnpm exec playwright install
+chromium`); without it `.sdlc/test e2e` skips them, unless
+`WEB_CHECKS_CI_STRICT=1`.
 
 Architecture, contracts (`InputSource`, `CheckModule`, `BrowserDriver`, …) and
 the check catalog live in the SPEC and implementation plan under `.memory/`.
 
 ### Releasing
 
-1. Set the same version in `package.json` and `src/version.ts` (a unit test
-   checks they match) and add a CHANGELOG entry if there is one.
-2. Merge to `main`, then tag and push: `git tag vX.Y.Z && git push origin vX.Y.Z`.
-3. The `Release` workflow checks that the tag matches the version, runs lint,
-   typecheck and unit tests, packs the tarball, installs it in a fresh prefix and
-   runs it, then creates the GitHub release with the tarball and `SHA256SUMS`.
+1. From an up-to-date, clean `main`: `.sdlc/release X.Y.Z X.Y.Z+1`. It sets
+   the version in `package.json` and `src/version.ts`, commits, tags `vX.Y.Z`,
+   moves to `X.Y.Z+1-SNAPSHOT` and pushes branch and tag.
+2. The `Release` workflow checks that the tag matches the version, runs
+   `.sdlc/ci` (lint, unit tests, the tarball installed in a fresh prefix and
+   run), then creates the GitHub release with the tarball and `SHA256SUMS`.
+
+To try a build with poqa-web before releasing, `.sdlc/package` and point
+`~/.config/poqa/web/tools.toml` at `out/`.

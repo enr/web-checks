@@ -1,0 +1,42 @@
+name: Release
+
+# Pushing a tag vX.Y.Z (.sdlc/release) publishes a GitHub release with the
+# npm-pack tarball and SHA256SUMS. web-checks is not published on the npm
+# registry (SPEC D9): poqa and users install the tarball from the release.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: pnpm
+      - run: sudo apt-get install -y shellcheck
+
+      # The tag must name the version of package.json (.sdlc/package checks that
+      # src/version.ts agrees with it).
+      - name: Check version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg="$(node -p "require('./package.json').version")"
+          echo "tag=$tag package.json=$pkg"
+          test "$tag" = "$pkg"
+
+      # Install, lint, unit tests, then out/web-checks-<version>.tgz + SHA256SUMS,
+      # smoke-tested the way poqa-web installs it.
+      - run: .sdlc/ci
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" out/*.tgz out/SHA256SUMS --title "$GITHUB_REF_NAME" --generate-notes

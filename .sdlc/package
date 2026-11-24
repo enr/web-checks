@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Builds the release artifacts the way poqa-web installs them:
+#
+#   out/web-checks-<version>.tgz   the npm pack tarball (not published on npm, SPEC D9)
+#   out/SHA256SUMS
+#
+# then installs the tarball in a throwaway prefix (no dev dependencies) and runs it,
+# which catches a broken `files`/`bin` before a release exists. Used by the release
+# workflow; locally, out/ can feed poqa-web through ~/.config/poqa/web/tools.toml.
+
+set -euo pipefail
+# shellcheck source=_lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
+require npm sha256sum
+
+version="$(project_version)"
+src_version="$(sed -n "s/^export const VERSION = '\(.*\)';$/\1/p" src/version.ts)"
+[[ "${version}" == "${src_version}" ]] || {
+  echo >&2 "package.json (${version}) and src/version.ts (${src_version}) disagree"
+  exit 1
+}
+
+"${sdlc_dir}/build"
+
+echo "--- Pack ---"
+rm -rf out
+mkdir -p out
+npm pack --silent --pack-destination out >/dev/null
+(cd out && sha256sum ./*.tgz | sed 's# \./# #' > SHA256SUMS && cat SHA256SUMS)
+
+echo "--- Smoke test the packed tarball ---"
+prefix="$(mktemp -d)"
+trap 'rm -rf "${prefix}"' EXIT
+# Absolute path: a relative "out/x.tgz" reads as a GitHub shorthand to recent npm.
+npm install --omit=dev --no-audit --no-fund --loglevel=error --prefix "${prefix}" "${prj_home}/out/web-checks-${version}.tgz"
+cli="${prefix}/node_modules/web-checks/dist/cli/index.js"
+actual="$(node "${cli}" --version)"
+[[ "${actual}" == "${version}" ]] || { echo >&2 "--version prints ${actual}, expected ${version}"; exit 1; }
+node "${cli}" tests/fixtures/manifest-ok --mode build --format json > "${prefix}/smoke.json"
+node -e "
+  const r = require(process.argv[1]);
+  if (r.tool !== 'web-checks' || r.score.grade !== 'A') {
+    console.error('smoke run: unexpected result', r.tool, r.score && r.score.grade);
+    process.exit(1);
+  }
+" "${prefix}/smoke.json"
+echo "==> out/web-checks-${version}.tgz ok"

@@ -1,0 +1,8 @@
+{
+  "name": "Partial Screenshots App",
+  "start_url": "/",
+  "display": "standalone",
+  "screenshots": [
+    { "src": "/shots/desktop.png", "sizes": "1280x800", "type": "image/png", "form_factor": "wide" }
+  ]
+}

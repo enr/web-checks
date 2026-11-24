@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# Cuts a release: release commit + tag vX.Y.Z, then the next snapshot, then push.
+# The tag triggers .github/workflows/release.yml, which publishes the GitHub release
+# (tarball + SHA256SUMS) that poqa-web downloads.
+#
+#   .sdlc/release <release_version> <next_version>     e.g. .sdlc/release 0.1.0 0.1.1
+#
+# The version lives in package.json and src/version.ts (tests/version.test.ts keeps
+# them equal); both are rewritten. If they already name the release version, the
+# tag goes on the current commit.
+
+set -euo pipefail
+# shellcheck source=_lib.sh
+source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
+require git jq
+
+usage() {
+  echo 'Usage: release <release_version> <next_version>'
+  echo 'Example: release 0.1.0 0.1.1'
+}
+
+[[ -n "${1:-}" ]] || { echo 'Missing release version: aborting release'; usage; exit 1; }
+[[ -n "${2:-}" ]] || { echo 'Missing next version: aborting release'; usage; exit 1; }
+release_version="$1"
+snapshot_version="$2-SNAPSHOT"
+tag_name="v${release_version}"
+
+git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1 || {
+  echo 'No upstream set for current branch: aborting release'
+  exit 1
+}
+git fetch --quiet
+[[ "$(git rev-parse @)" == "$(git rev-parse '@{u}')" ]] || {
+  echo 'Local branch and its upstream are not aligned: aborting release'
+  exit 1
+}
+[[ -z "$(git tag -l "${tag_name}")" ]] || { echo "Tag ${tag_name} exists: aborting release"; exit 1; }
+[[ -z "$(git status --porcelain)" ]] || { echo 'Uncommitted changes detected: aborting release'; exit 1; }
+
+echo "Release ${release_version} (tag ${tag_name}), then snapshot ${snapshot_version}"
+
+set_version() {
+  local tmp
+  tmp="$(mktemp)"
+  jq --arg v "$1" '.version = $v' package.json > "${tmp}"
+  cat "${tmp}" > package.json
+  rm -f "${tmp}"
+  sed -i "s/^export const VERSION = '.*';$/export const VERSION = '$1';/" src/version.ts
+  git add package.json src/version.ts
+}
+
+# --- release commit ---
+set_version "${release_version}"
+if git diff --cached --quiet; then
+  echo "Version already ${release_version}: tagging the current commit"
+else
+  git commit -m "release ${release_version}"
+fi
+git tag -a "${tag_name}" -m "Release ${release_version}"
+
+# --- back to snapshot ---
+set_version "${snapshot_version}"
+git commit -m "[skip ci] prepare snapshot ${snapshot_version}"
+
+git push
+git push origin "${tag_name}"

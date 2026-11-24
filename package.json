@@ -1,0 +1,61 @@
+{
+  "name": "web-checks",
+  "private": true,
+  "version": "0.1.0",
+  "description": "CLI checks for web applications in the browser: runtime health, responsive layout, PWA best practices",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "web-checks": "./dist/cli/index.js"
+  },
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run --exclude 'tests/e2e/**'",
+    "test:e2e": "vitest run tests/e2e",
+    "test:watch": "vitest",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "dev": "tsx src/cli/index.ts"
+  },
+  "keywords": [
+    "pwa",
+    "progressive-web-app",
+    "validator",
+    "manifest",
+    "service-worker",
+    "responsive",
+    "cli"
+  ],
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^20.19.0",
+    "ajv": "^8.20.0",
+    "tsup": "^8.3.5",
+    "tsx": "^4.23.0",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "pnpm": {
+    "onlyBuiltDependencies": ["@biomejs/biome", "esbuild"]
+  },
+  "dependencies": {
+    "acorn": "^8.17.0",
+    "acorn-walk": "^8.3.5",
+    "node-html-parser": "^8.0.4",
+    "picocolors": "^1.1.1",
+    "playwright": "^1.61.1"
+  }
+}

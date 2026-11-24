@@ -1,0 +1,11 @@
+{
+  "name": "Screenshots App",
+  "short_name": "Shots",
+  "start_url": "/",
+  "display": "standalone",
+  "icons": [{ "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }],
+  "screenshots": [
+    { "src": "/shots/desktop.png", "sizes": "1280x800", "type": "image/png", "form_factor": "wide" },
+    { "src": "/shots/mobile.png", "sizes": "390x844", "type": "image/png", "form_factor": "narrow" }
+  ]
+}

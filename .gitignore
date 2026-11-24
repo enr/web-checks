@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+coverage/
+.web-checks-auth-cache/
+# Sessions recorded by `web-checks auth record`: they grant account access.
+web-checks.auth-state.json
+.auth/
+out/

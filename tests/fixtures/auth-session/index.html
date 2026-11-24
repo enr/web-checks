@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Auth session</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      // Like MSAL: the token lives in sessionStorage; without it, go to login.
+      if (sessionStorage.getItem('token')) {
+        document.getElementById('app').innerHTML =
+          '<div data-testid="app-shell"><h1>Dashboard</h1></div>';
+      } else {
+        location.replace('/login.html');
+      }
+    </script>
+  </body>
+</html>
