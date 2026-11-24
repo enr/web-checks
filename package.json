@@ -1,7 +1,7 @@
 {
   "name": "web-checks",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1-SNAPSHOT",
   "description": "CLI checks for web applications in the browser: runtime health, responsive layout, PWA best practices",
   "type": "module",
   "license": "MIT",
