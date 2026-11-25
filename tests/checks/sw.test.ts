@@ -1,5 +1,9 @@
 import { describe, expect, test } from 'vitest';
-import { analyzeSw } from '../../src/checks/tier0/sw/shared.js';
+import {
+  analyzeSw,
+  importedSpecifiers,
+  resolveSpecifier,
+} from '../../src/checks/tier0/sw/shared.js';
 import { runSingleCheck } from '../helpers/run.js';
 
 describe('SW-01 presence', () => {
@@ -19,6 +23,10 @@ describe('SW-02 registration', () => {
   });
   test('error when no register() call', async () => {
     expect((await runSingleCheck('sw-missing', 'SW-02')).status).toBe('error');
+  });
+  test('pass when register() is in a chunk the entry imports (code splitting)', async () => {
+    const f = await runSingleCheck('sw-chunked', 'SW-02');
+    expect(f.status).toBe('pass');
   });
 });
 
@@ -65,5 +73,27 @@ describe('analyzeSw unit', () => {
   });
   test('flags Workbox-generated SW', () => {
     expect(analyzeSw('workbox.precaching.precacheAndRoute([]);').workboxGenerated).toBe(true);
+  });
+});
+
+describe('SW registration: import following', () => {
+  test('collects relative static, re-export and literal dynamic imports', () => {
+    const code =
+      'import{a as i}from"./c/a.js";import"./c/b.js";export{x}from"../d.js";import("./lazy.js");import x from"lit";';
+    expect(importedSpecifiers(code)).toEqual([
+      './c/a.js',
+      './c/b.js',
+      '../d.js',
+      './lazy.js',
+      'lit',
+    ]);
+  });
+  test('resolves against the importer path and skips bare specifiers', () => {
+    expect(resolveSpecifier('/assets/app.js', './chunks/a.js')).toBe('/assets/chunks/a.js');
+    expect(resolveSpecifier('/assets/chunks/a.js', '../b.js')).toBe('/assets/b.js');
+    expect(resolveSpecifier('/assets/app.js', 'lit')).toBeNull();
+    expect(resolveSpecifier('https://cdn.example/x/app.js', './y.js')).toBe(
+      'https://cdn.example/x/y.js',
+    );
   });
 });

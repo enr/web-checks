@@ -69,11 +69,53 @@ function tryParse(code: string): ReturnType<typeof parse> | null {
 /** Regex fallback to find navigator.serviceWorker.register('url'). */
 const REGISTER_RE = /navigator\s*\.\s*serviceWorker\s*\.\s*register\s*\(\s*['"`]([^'"`]+)['"`]/;
 
+/**
+ * Relative module specifiers imported by a script: `import … from "./x.js"`,
+ * `import "./x.js"`, `export … from "./x.js"` and `import("./x.js")` with a
+ * literal. Bare specifiers (npm packages) cannot be resolved without an
+ * import map and are skipped.
+ */
+const IMPORT_RE =
+  /(?:\bimport\s*(?:[\w$*{}\s,]+?\s*from\s*)?|\bexport\s*[\w$*{}\s,]*?\s*from\s*|\bimport\s*\(\s*)(['"`])([^'"`\n]+)\1/g;
+
+/** Upper bound on the scripts read while following imports. */
+const MAX_SCRIPTS = 200;
+
+/** Resolve a module specifier against the logical path of its importer. */
+export function resolveSpecifier(importer: string, spec: string): string | null {
+  if (!/^(\.{1,2}\/|\/)/.test(spec)) return null;
+  if (/^https?:\/\//.test(importer)) return new URL(spec, importer).href;
+  const importerPath = importer.split(/[?#]/)[0] ?? importer;
+  const base = importerPath.startsWith('/') ? importerPath : `/${importerPath}`;
+  return new URL(spec, `http://x${base}`).pathname;
+}
+
+/** Relative specifiers imported by `code` (static, re-exports, literal dynamic). */
+export function importedSpecifiers(code: string): string[] {
+  const out: string[] = [];
+  for (const m of code.matchAll(IMPORT_RE)) {
+    if (m[2]) out.push(m[2]);
+  }
+  return out;
+}
+
+/**
+ * Look for navigator.serviceWorker.register(...) in the entry scripts and in
+ * the modules they import: a bundler with code splitting (esbuild/Rollup/Vite)
+ * moves shared code — often the registration helper — into chunks that the
+ * entry only imports.
+ */
 async function findRegistration(
   input: InputSource,
 ): Promise<{ registered: boolean; arg?: string }> {
   const head = await parseHead({ input });
-  for (const src of head.scripts) {
+  const queue = [...head.scripts];
+  const seen = new Set<string>();
+  while (queue.length > 0 && seen.size < MAX_SCRIPTS) {
+    const src = queue.shift() as string;
+    const key = src.split(/[?#]/)[0] ?? src;
+    if (seen.has(key)) continue;
+    seen.add(key);
     const asset = await input.read(src);
     if (!asset) continue;
     const code = asset.bytes.toString('utf8');
@@ -81,6 +123,10 @@ async function findRegistration(
     if (m) return { registered: true, arg: m[1] };
     if (/navigator\s*\.\s*serviceWorker\s*\.\s*register\s*\(/.test(code)) {
       return { registered: true };
+    }
+    for (const spec of importedSpecifiers(code)) {
+      const resolved = resolveSpecifier(key, spec);
+      if (resolved && !seen.has(resolved)) queue.push(resolved);
     }
   }
   return { registered: false };
