@@ -167,7 +167,7 @@ Other settings, as flags or under `auth` in the config file:
 | Setting | Meaning |
 | --- | --- |
 | `--auth-cache <file>` / `auth.cache: { path, ttl }` | Save the session after login and reuse it (12 h by default with the flag); a cached session that no longer opens the app triggers a fresh login. `--refresh-auth` ignores it |
-| `auth.ready: { url?, selector?, timeoutMs? }` | What the app shows once logged in: checks the recorded/cached session and the function form (a DSL's own `ready` wins). Without it, a visible password field or a URL ending in `/login`, `/signin`, `/logon` counts as a failed login. |
+| `auth.ready: { url?, selector?, timeoutMs? }` | What the app shows once logged in: checks the recorded/cached session and the function form (a DSL's own `ready` wins). Without it, a visible password field or a URL ending in `/login`, `/signin`, `/logon` counts as a failed login. A `url` starting with `/` is a path glob on the target's origin, query and hash ignored unless it has a `#` (`/app/index.html`, `/app/**`); any other `url` is a Playwright glob on the whole URL |
 | `auth.httpCredentials: { username, password }` | HTTP Basic/Digest credentials for a proxy in front of the app, also sent on the static requests; `{{secret.X}}` expanded |
 | `auth.headers` | Static headers on every page request; `{{secret.X}}` expanded |
 

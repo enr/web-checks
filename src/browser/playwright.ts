@@ -5,6 +5,7 @@
 import { existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import type { AuthSession, Cookie, SessionStorageEntry, StorageState } from '../auth/types.js';
+import { isPathPattern, matchesPathPattern, resolveAgainst } from '../auth/url-match.js';
 import type { AuthPage, BrowserDriver, DriverPage, Viewport, WaitUntil } from './driver.js';
 
 /**
@@ -61,7 +62,7 @@ type PwPage = {
   fill(selector: string, value: string): Promise<void>;
   click(selector: string): Promise<void>;
   press(selector: string, key: string): Promise<void>;
-  waitForURL(glob: string, opts?: { timeout?: number }): Promise<void>;
+  waitForURL(url: string | ((url: URL) => boolean), opts?: { timeout?: number }): Promise<void>;
   waitForLoadState(state: string, opts?: { timeout?: number }): Promise<void>;
   waitForSelector(selector: string, opts?: { timeout?: number }): Promise<void>;
   isVisible(selector: string): Promise<boolean>;
@@ -133,7 +134,7 @@ class PlaywrightAuthPage implements AuthPage {
   ) {}
 
   async goto(url: string): Promise<void> {
-    await this.page.goto(url, { waitUntil: 'load' });
+    await this.page.goto(resolveAgainst(url, this.baseUrl), { waitUntil: 'load' });
   }
   fill(selector: string, value: string): Promise<void> {
     return this.page.fill(selector, value);
@@ -145,7 +146,10 @@ class PlaywrightAuthPage implements AuthPage {
     return this.page.press(selector, key);
   }
   waitForUrl(glob: string, timeoutMs = 10000): Promise<void> {
-    return this.page.waitForURL(glob, { timeout: timeoutMs });
+    const matcher = isPathPattern(glob)
+      ? (url: URL) => matchesPathPattern(glob, url.href, this.baseUrl)
+      : glob;
+    return this.page.waitForURL(matcher, { timeout: timeoutMs });
   }
   waitForSelector(selector: string, timeoutMs = 10000): Promise<void> {
     return this.page.waitForSelector(selector, { timeout: timeoutMs });
