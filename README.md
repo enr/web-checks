@@ -27,9 +27,8 @@ installs it with its own Node.js and Chromium and runs it with
 
 web-checks is **not published on the public npm registry**. Each GitHub
 release attaches the tarball produced by `npm pack` and a `SHA256SUMS` file;
-install it from there (poqa does the same, after verifying the checksum).
-The repository is private, so downloading a release asset needs a GitHub token
-with read access (for example `gh release download vX.Y.Z -R enr/ubiquitous-robot`).
+install it from there (poqa does the same, after verifying the checksum), for
+example with `gh release download vX.Y.Z -R enr/web-checks`.
 
 ```sh
 sha256sum -c SHA256SUMS
