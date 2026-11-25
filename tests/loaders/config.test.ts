@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { resolveConfig } from '../../src/loaders/config.js';
+import { rebaseConfigPaths, resolveConfig } from '../../src/loaders/config.js';
 import { validateConfig } from '../../src/loaders/validate.js';
 
 describe('validateConfig', () => {
@@ -119,5 +119,37 @@ describe('packs in the config file', () => {
     expect(resolveConfig({ targets, packs: ['pwa'], user: { packs: ['head'] } }).packs).toEqual([
       'pwa',
     ]);
+  });
+});
+
+describe('rebaseConfigPaths', () => {
+  test('resolves the auth paths against the folder of the config file', () => {
+    const config = {
+      routes: ['/x'],
+      auth: {
+        module: './auth.mjs',
+        storageState: 'state.json',
+        cache: { path: '../.cache/auth.json', ttl: 1000 },
+        ready: { selector: '#app' },
+      },
+    };
+    expect(rebaseConfigPaths(config, '/repo/.config/web/web-checks.config.mjs')).toEqual({
+      routes: ['/x'],
+      auth: {
+        module: '/repo/.config/web/auth.mjs',
+        storageState: '/repo/.config/web/state.json',
+        cache: { path: '/repo/.config/.cache/auth.json', ttl: 1000 },
+        ready: { selector: '#app' },
+      },
+    });
+    // the input is left as it was
+    expect(config.auth.module).toBe('./auth.mjs');
+  });
+
+  test('keeps absolute paths and configs without auth', () => {
+    const abs = { auth: { module: '/abs/auth.mjs' } };
+    expect(rebaseConfigPaths(abs, '/repo/web-checks.config.json')).toEqual(abs);
+    const none = { routes: ['/'] };
+    expect(rebaseConfigPaths(none, '/repo/web-checks.config.json')).toBe(none);
   });
 });

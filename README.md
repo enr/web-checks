@@ -98,7 +98,10 @@ web-checks ./dist --only 'MAN-*'                    # only the manifest checks
 ### Configuration
 
 Zero-config by default. Optionally add `web-checks.config.{json,js,mjs}` (or pass
-`--config <path>`). Unknown keys are rejected as usage errors. Common keys:
+`--config <path>`). Unknown keys are rejected as usage errors. The file paths in it
+(`auth.module`, `auth.storageState`, `auth.cache.path`) are relative to the config
+file, whatever the working directory; the `--auth*` flags are relative to the
+working directory. Common keys:
 
 ```jsonc
 {

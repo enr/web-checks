@@ -3,7 +3,7 @@
 // hand-written validateConfig live here.
 
 import { readFile, stat } from 'node:fs/promises';
-import { isAbsolute, join, resolve as resolvePath } from 'node:path';
+import { dirname, isAbsolute, join, resolve as resolvePath } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { Category, Grade, Mode } from '../core/check.js';
 import {
@@ -93,6 +93,31 @@ async function fileExists(p: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+/**
+ * Resolve the file paths of a validated config (`auth.module`,
+ * `auth.storageState`, `auth.cache.path`) against the folder of the config
+ * file they come from, so a config works whatever the working directory of
+ * the run (poqa-web, for one, runs from the project root). Absolute paths are
+ * kept; the CLI flags (`--auth`, `--auth-state`, `--auth-cache`) stay relative
+ * to the working directory. Returns a new config, the input is not modified.
+ */
+export function rebaseConfigPaths(config: UserConfig, configPath: string): UserConfig {
+  const auth = config.auth;
+  if (!auth || typeof auth !== 'object' || Array.isArray(auth)) return config;
+  const dir = dirname(resolvePath(configPath));
+  const rebase = (p: unknown) =>
+    typeof p === 'string' && p !== '' && !isAbsolute(p) ? resolvePath(dir, p) : p;
+  const a = { ...(auth as Record<string, unknown>) };
+  if ('module' in a) a.module = rebase(a.module);
+  if ('storageState' in a) a.storageState = rebase(a.storageState);
+  if (a.cache && typeof a.cache === 'object' && !Array.isArray(a.cache)) {
+    const cache = { ...(a.cache as Record<string, unknown>) };
+    cache.path = rebase(cache.path);
+    a.cache = cache;
+  }
+  return { ...config, auth: a };
 }
 
 /**

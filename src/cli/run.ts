@@ -14,7 +14,7 @@ import { ConsoleLogger, type LogLevel, SecretRegistry } from '../core/logger.js'
 import { type ResolvedTarget, resolveModes } from '../core/modes.js';
 import { DEFAULT_PACKS, PACKS, type Pack, packOf, selectModules } from '../core/packs.js';
 import { ALL_CHECKS } from '../core/registry.js';
-import { loadConfigFile, resolveConfig } from '../loaders/config.js';
+import { loadConfigFile, rebaseConfigPaths, resolveConfig } from '../loaders/config.js';
 import { FsSource, HttpSource, type InputSource } from '../loaders/input.js';
 import { validateConfig } from '../loaders/validate.js';
 import { type PackState, type RunResult, buildRunResult } from '../report/result.js';
@@ -103,7 +103,7 @@ export async function run(opts: RunOptions): Promise<RunResult> {
     if (loaded) {
       const { config: validated, errors } = validateConfig(loaded.raw);
       if (errors.length > 0) throw new ConfigError(errors);
-      user = validated;
+      user = validated && rebaseConfigPaths(validated, loaded.path);
     } else if (opts.configPath) {
       throw new ConfigError([`config file not found: ${opts.configPath}`]);
     }
