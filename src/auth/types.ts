@@ -1,4 +1,4 @@
-// Pluggable authentication contract (SPEC §Autenticazione).
+// Pluggable authentication contract (SPEC §Authentication).
 // The user supplies a single JS file whose default export is one of three forms,
 // or a recorded session (`web-checks auth record`) loaded from a file.
 
@@ -65,7 +65,7 @@ export interface AuthContext {
   log: Logger;
 }
 
-// SPEC §Autenticazione defines this union with `void` (a fn that returns nothing).
+// SPEC §Authentication defines this union with `void` (a fn that returns nothing).
 // biome-ignore lint/suspicious/noConfusingVoidType: matches the SPEC contract
 export type AuthResult = void | { storageState?: StorageState } | AuthSession;
 

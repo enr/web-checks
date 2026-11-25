@@ -1,5 +1,5 @@
 // Centralized message catalog (English; single point for future i18n).
-// SPEC §"Lingua dei messaggi": message/fix texts live here, never inline in the
+// SPEC §"Message language": message/fix texts live here, never inline in the
 // ~80 checks. Populated per check during Phase 1.
 
 export interface CheckMessages {

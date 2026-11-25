@@ -11,7 +11,7 @@ files, runtime behavior) — no per-framework tooling.
 > widened to any application that opens in a browser (sites, SPAs,
 > server-rendered pages, admin panels, PWAs): checks are grouped in packs and
 > the PWA checks only run when the app is a PWA. See
-> [`.memory/SPEC.md`](.memory/SPEC.md) §Perimetro e pacchetti.
+> [`.memory/SPEC.md`](.memory/SPEC.md) §"Scope and packs".
 >
 > Implemented: check packs with a grade per pack, Tier 0 (static), Tier 1
 > (Playwright: responsiveness, runtime health, live installability/offline/SW),
@@ -128,7 +128,7 @@ three forms — a declarative DSL (`{ steps: [...] }`), an imperative function
 `{ sessionStorage }`). Secrets read via `ctx.secret()` / `{{secret.X}}` are
 never printed; `ctx.totp('X')` / `{{totp.X}}` give the current authenticator
 code for the base32 seed in `X`. See [`examples/auth`](examples/auth) and SPEC
-§Autenticazione.
+§Authentication.
 
 ```js
 export default {
@@ -167,7 +167,7 @@ Other settings, as flags or under `auth` in the config file:
 | Setting | Meaning |
 | --- | --- |
 | `--auth-cache <file>` / `auth.cache: { path, ttl }` | Save the session after login and reuse it (12 h by default with the flag); a cached session that no longer opens the app triggers a fresh login. `--refresh-auth` ignores it |
-| `auth.ready: { url?, selector?, timeoutMs? }` | What the app shows once logged in: checks the recorded/cached session and the function form (a DSL's own `ready` wins). Without it, a visible password field or a URL ending in `/login`, `/signin`, `/logon` counts as a failed login |
+| `auth.ready: { url?, selector?, timeoutMs? }` | What the app shows once logged in: checks the recorded/cached session and the function form (a DSL's own `ready` wins). Without it, a visible password field or a URL ending in `/login`, `/signin`, `/logon` counts as a failed login. |
 | `auth.httpCredentials: { username, password }` | HTTP Basic/Digest credentials for a proxy in front of the app, also sent on the static requests; `{{secret.X}}` expanded |
 | `auth.headers` | Static headers on every page request; `{{secret.X}}` expanded |
 

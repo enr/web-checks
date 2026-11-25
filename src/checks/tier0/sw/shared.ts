@@ -1,5 +1,5 @@
 // Shared per-run Service Worker discovery + static analysis (acorn AST).
-// IMPLEMENTATION_PLAN §"Rilevamento SW & analisi eventi".
+// IMPLEMENTATION_PLAN §"SW detection & event analysis".
 
 import { parse } from 'acorn';
 import { simple } from 'acorn-walk';

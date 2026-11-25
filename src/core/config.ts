@@ -12,7 +12,7 @@ export interface Breakpoint {
   class: 'mobile' | 'tablet' | 'desktop';
 }
 
-/** The six fixed breakpoints (SPEC §"Responsiveness — punto di partenza"). */
+/** The six fixed breakpoints (SPEC §"Responsiveness — starting point"). */
 export const DEFAULT_BREAKPOINTS: readonly Breakpoint[] = [
   { name: 'mobile-s', width: 320, height: 568, class: 'mobile' },
   { name: 'mobile-m', width: 360, height: 740, class: 'mobile' },
@@ -22,7 +22,7 @@ export const DEFAULT_BREAKPOINTS: readonly Breakpoint[] = [
   { name: 'desktop-l', width: 1920, height: 1080, class: 'desktop' },
 ] as const;
 
-/** Default category weights (SPEC §"Pesi per categoria"), sum = 100. */
+/** Default category weights (SPEC §"Category weights"), sum = 100. */
 export const DEFAULT_WEIGHTS: Readonly<Partial<Record<Category, number>>> = {
   Manifest: 20,
   ServiceWorker: 18,

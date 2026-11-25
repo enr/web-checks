@@ -1,4 +1,4 @@
-// Session files on disk (SPEC §"caching"):
+// Session files on disk (SPEC §"Caching"):
 // - the cache (`auth.cache`): storageState with a TTL, lets repeat runs skip
 //   the login; invalidated on TTL expiry, on --refresh-auth, or when the
 //   session no longer passes the login-wall guard;

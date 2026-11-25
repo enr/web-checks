@@ -1,4 +1,4 @@
-// Colored CLI formatter (SPEC §Output — Primario). Colors are disabled when
+// Colored CLI formatter (SPEC §"Output — Primary"). Colors are disabled when
 // stdout is not a TTY, when NO_COLOR is set, or via --no-color.
 
 import pc from 'picocolors';

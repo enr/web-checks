@@ -1,6 +1,6 @@
 // Deterministic measurement preconditions + a single per-(route×breakpoint)
-// snapshot (IMPLEMENTATION_PLAN §A.3, §"RSP-*: un solo evaluate", SPEC
-// §"Precondizioni di misura"). All RSP-* read from the shared snapshot; they do
+// snapshot (IMPLEMENTATION_PLAN §A.3, §"RSP-*: a single evaluate", SPEC
+// §"Measurement preconditions"). All RSP-* read from the shared snapshot; they do
 // not each round-trip to the browser.
 
 import type { Breakpoint } from '../core/config.js';

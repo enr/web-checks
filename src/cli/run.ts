@@ -178,7 +178,7 @@ export async function run(opts: RunOptions): Promise<RunResult> {
 
   try {
     // Authenticate once, before the (deterministic) measurements, reusing the
-    // session across every route and breakpoint (SPEC §Autenticazione).
+    // session across every route and breakpoint (SPEC §Authentication).
     let auth: AuthRuntime | undefined;
     if (authConfig && liveTarget) {
       auth = await authenticate(authConfig, {
@@ -250,7 +250,7 @@ export function mergeAuthConfig(
 }
 
 /**
- * Which packs run (SPEC §"Perimetro e pacchetti"): the explicit list from
+ * Which packs run (SPEC §"Scope and packs"): the explicit list from
  * --pack/`packs`, or the defaults plus `pwa` when any target looks like a PWA.
  */
 async function decidePacks(

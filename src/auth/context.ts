@@ -1,4 +1,4 @@
-// AuthContext implementation (SPEC §Autenticazione). Provides env/secret/totp/
+// AuthContext implementation (SPEC §Authentication). Provides env/secret/totp/
 // resolve/log to the user auth module; secrets are registered for redaction so
 // they never reach report/log (§A.6).
 

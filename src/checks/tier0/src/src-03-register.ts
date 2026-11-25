@@ -4,7 +4,7 @@ import { messages } from '../../../report/messages.js';
 import { findRegisterCall } from './shared.js';
 
 // SRC-03: a navigator.serviceWorker.register(...) call exists somewhere in the
-// source. Replaces SW-02 in source mode (SPEC §Modalità). Advisory.
+// source. Replaces SW-02 in source mode (SPEC §Modes). Advisory.
 export const src03: CheckModule = {
   check: {
     id: 'SRC-03',

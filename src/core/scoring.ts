@@ -1,5 +1,5 @@
 // Scoring: category weights, per-mode normalization, blocker cap, A–F grade.
-// SPEC §"Sistema di punteggio". Verified against golden fixtures in Phase 1.
+// SPEC §"Scoring system". Verified against golden fixtures in Phase 1.
 
 import type { Category, Finding, Grade } from './check.js';
 import type { ResolvedConfig } from './config.js';
@@ -61,7 +61,7 @@ export function hasScorable(findings: Finding[]): boolean {
 
 /**
  * Compute the score from the fused findings.
- * Steps (SPEC §Calcolo):
+ * Steps (SPEC §Computation):
  * 1. keep only error/warning checks applicable and not skipped;
  * 2. per category: passedWeight / applicableWeight;
  * 3. redistribute the weight of categories with no applicable checks;

@@ -1,7 +1,7 @@
 // Factory for snapshot-based RSP-* Tier 1 checks. Reads the shared per-run
 // snapshots and reports a single worst-of Finding: pass when no instance
 // offends, otherwise the check severity with every failing instance in evidence
-// (SPEC §"Aggregazione multi-istanza" — worst-of).
+// (SPEC §"Multi-instance aggregation" — worst-of).
 
 import type { MeasureSnapshot } from '../../../browser/measure.js';
 import type { Check } from '../../../core/check.js';

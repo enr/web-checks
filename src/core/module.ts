@@ -31,7 +31,7 @@ export interface CheckContext {
 }
 
 export interface CheckModule {
-  /** Static metadata (SPEC §"Modello dati"). */
+  /** Static metadata (SPEC §"Data model"). */
   check: Check;
   /** ids of other checks; the engine topologically sorts on them (§A.4). */
   dependsOn?: string[];

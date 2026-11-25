@@ -1,4 +1,4 @@
-// PWA detection (SPEC §"Perimetro e pacchetti"): the `pwa` pack is active by
+// PWA detection (SPEC §"Scope and packs"): the `pwa` pack is active by
 // default only when the target looks like a Progressive Web App. Reuses the
 // same helpers as MAN-01/SRC-01 (loadManifest is cached per InputSource, so
 // detection costs no extra request when the same input then runs the checks).

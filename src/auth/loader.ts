@@ -1,4 +1,4 @@
-// Detect the form of the user auth module's default export (SPEC §Autenticazione):
+// Detect the form of the user auth module's default export (SPEC §Authentication):
 // AuthFn (function) | AuthDSL ({ steps }) | AuthSession (cookies/headers/state).
 
 import { isAbsolute, resolve } from 'node:path';

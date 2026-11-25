@@ -4,7 +4,7 @@ import { messages } from '../../../report/messages.js';
 import { findPwaPlugin, findStaticSw } from './shared.js';
 
 // SRC-02: SW present as a static file OR a PWA plugin declared in package.json.
-// Replaces SW-01/SW-02 in source mode (SPEC §Modalità). Advisory.
+// Replaces SW-01/SW-02 in source mode (SPEC §Modes). Advisory.
 export const src02: CheckModule = {
   check: {
     id: 'SRC-02',

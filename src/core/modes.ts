@@ -1,5 +1,5 @@
 // Mode auto-detection, combination and precedence.
-// Rules from IMPLEMENTATION_PLAN §A.9 ("Auto-detect del modo") and SPEC §Modalità.
+// Rules from IMPLEMENTATION_PLAN §A.9 ("Mode auto-detection") and SPEC §Modes.
 
 import { readFile, stat } from 'node:fs/promises';
 import { join } from 'node:path';

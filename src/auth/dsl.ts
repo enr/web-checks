@@ -1,4 +1,4 @@
-// DSL interpreter (SPEC §"DSL — step supportati"). Runs a safe, framework-
+// DSL interpreter (SPEC §"DSL — supported steps"). Runs a safe, framework-
 // agnostic subset of steps on an AuthPage. {{env.*}}/{{secret.*}} are expanded;
 // secrets are registered for redaction.
 

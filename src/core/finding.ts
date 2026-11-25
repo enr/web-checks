@@ -48,7 +48,7 @@ function skipMessage(reason: SkipReason): string {
 /**
  * Effective intra-category weight of a check for scoring.
  * Explicit `weight` wins; otherwise derived from severity: error = 3, warning = 1.
- * `info` has no weight and does not enter the score (SPEC §"Peso dei controlli").
+ * `info` has no weight and does not enter the score (SPEC §"Check weight").
  */
 export function effectiveWeight(check: Check): number {
   if (check.weight !== undefined) return check.weight;

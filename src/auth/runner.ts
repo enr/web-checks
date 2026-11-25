@@ -1,7 +1,7 @@
 // Auth runner: build the authenticated session once (before checks) from, in
 // order, the cache, a recorded session file, or the auth module; apply the
 // login-wall guard; return an AuthRuntime reused across all routes/breakpoints
-// (SPEC §"Ciclo di vita").
+// (SPEC §"Lifecycle").
 
 import type { BrowserDriver } from '../browser/driver.js';
 import type { AuthConfig } from '../core/config.js';

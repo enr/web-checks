@@ -154,7 +154,7 @@ export function buildRunResult(
       : ('no-scored-checks' as const);
   const advisory = advisoryReason !== undefined;
   const score = computeScore(findings, config);
-  // CI gate (SPEC §Output futuro D2): grade >= threshold. Advisory (source-only)
+  // CI gate (SPEC §"Future output" D2): grade >= threshold. Advisory (source-only)
   // runs have no real grade, so the gate never fails them.
   const threshold = config.failBelowGrade;
   const gate = threshold

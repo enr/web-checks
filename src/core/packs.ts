@@ -1,4 +1,4 @@
-// Check packs (SPEC §"Perimetro e pacchetti"). A pack groups checks by what
+// Check packs (SPEC §"Scope and packs"). A pack groups checks by what
 // they verify; check ids and categories are unchanged. Membership is derived
 // from the check id/category here, in one place, rather than declared in every
 // check module, so the mapping can be read (and tested) as a whole.

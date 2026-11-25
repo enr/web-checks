@@ -2,7 +2,7 @@
 // - topological sort on dependsOn (§A.4)
 // - skip-not-fail: non-applicable checks become `skipped`, never failed (§A.7)
 // - check isolation: an unplanned throw becomes an internal-error Finding (§A.7)
-// - worst-of aggregation for multi-instance checks (SPEC §Aggregazione multi-istanza)
+// - worst-of aggregation for multi-instance checks (SPEC §"Multi-instance aggregation")
 // - multi-mode fusion by check id (§A.5)
 
 import type { AuthRuntime } from '../auth/types.js';
@@ -50,7 +50,7 @@ export function toposort(modules: readonly CheckModule[]): CheckModule[] {
   return ordered;
 }
 
-/** Worst-of aggregation: a check fails if any instance fails (SPEC §Aggregazione). */
+/** Worst-of aggregation: a check fails if any instance fails (SPEC §"Multi-instance aggregation"). */
 export function aggregateWorstOf(findings: Finding[]): Finding {
   if (findings.length === 1) return findings[0] as Finding;
   const first = findings[0] as Finding;
@@ -187,7 +187,7 @@ function appendMode(evidence: string | undefined, mode: Mode): string {
 
 /**
  * Source-mode results are a pre-flight advisory and do NOT concur to the score
- * (SPEC §Modalità). A scored (non-Preflight) finding whose winning mode is
+ * (SPEC §Modes). A scored (non-Preflight) finding whose winning mode is
  * `source` is demoted to skipped('advisory-preflight'); Preflight SRC-* stay.
  */
 function demoteSourceOutcome(mode: Mode, finding: Finding): Finding {
